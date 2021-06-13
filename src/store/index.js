@@ -2,31 +2,56 @@ import { createStore } from "vuex";
 import axios from "axios";
 
 export default createStore({
-  // this is where we gonna store all of our data
-  // This is where we gonna store all the information of the application
-
   state: {
-    // the data it self, this is accessible in any component
-    // in comneent to get access to it we do items: this.$store.state.products
     products: [],
+    productsInBag: [],
   },
   mutations: {
-    // this has access to the state
-    // mutations are synchronouse compare to the action
-    // first argement is allways the state
-    // second us the data
-    items(state, products) {
-      console.log(products);
+    loadProducts(state, products) {
       state.products = products;
+    },
+    loadBag(state, products) {
+      state.productsInBag = products;
+    },
+    addToBag(state, product) {
+      state.productsInBag.push(product);
+      localStorage.setItem(
+        "productsInBag",
+        JSON.stringify(state.productsInBag)
+      );
+    },
+    removeFromBag(state, productId) {
+      var updatedBag = state.productsInBag.filter(
+        (item) => productId != item.id
+      );
+      state.productsInBag = updatedBag;
+      localStorage.setItem(
+        "productsInBag",
+        JSON.stringify(state.productsInBag)
+      );
     },
   },
   actions: {
-    // we can call from any component by dispacting
-    // we use commit to pass it to out mutations
     loadProducts({ commit }) {
-      axios.get("https://fakestoreapi.com/products").then((res) => {
-        commit("items", res.data);
+      axios.get("https://fakestoreapi.com/products").then((response) => {
+        commit("loadProducts", response.data);
       });
+    },
+
+    loadBag({ commit }) {
+      if (localStorage.getItem("productsInBag")) {
+        commit("loadBag", JSON.parse(localStorage.getItem("productsInBag")));
+      }
+    },
+
+    addToBag({ commit }, product) {
+      commit("addToBag", product);
+    },
+
+    removeFromBag({ commit }, productId) {
+      if (confirm("Are you sure you want to remove the item from bag?")) {
+        commit("removeFromBag", productId);
+      }
     },
   },
   modules: {},

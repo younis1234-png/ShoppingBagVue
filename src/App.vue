@@ -2,7 +2,9 @@
   <div id="nav">
     <!-- router-link is linking the nav to a path, it will render as link -->
     <router-link to="/">Home</router-link> -
-    <router-link to="/basket">Shopping Bag (0)</router-link>
+    <router-link to="/basket"
+      >Shopping Bag ({{ this.productsInBag.length }})</router-link
+    >
   </div>
   <!-- router-view is where all our rute will render 
   it comes with vue router -->
@@ -10,10 +12,15 @@
 </template>
 
 <script>
+import { mapState } from "vuex";
 export default {
   created() {
+    // run both of this when it render
+    //get also get it from localsotorage loadBag
     this.$store.dispatch("loadProducts");
+    this.$store.dispatch("loadBag");
   },
+  computed: mapState(["productsInBag"]),
 };
 </script>
 
